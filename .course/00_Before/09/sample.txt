@@ -1,0 +1,2 @@
+Managing Errors in Go
+Corneile Britz
