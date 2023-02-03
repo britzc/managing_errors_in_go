@@ -3,21 +3,16 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
+	"strings"
 )
 
 func main() {
-	log.Println("test")
-
-	i := 0
-	defer fmt.Println(i)
-	i++
-	defer fmt.Println(i)
-	i++
+	heading("Defer Panic Recover Output")
+	DeferPanicRecover()
 }
 
-func Sample() {
+func DeferPanicRecover() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("Recovered:", r)
@@ -38,7 +33,7 @@ func Print(x, y int) {
 	fmt.Println("Result:", res)
 }
 
-func CopyFileOld(srcPath string, dstPath string) (count int64, err error) {
+func CopyFileWithoutDefer(srcPath string, dstPath string) (count int64, err error) {
 	src, err := os.Open(srcPath)
 	if err != nil {
 		return 0, err
@@ -57,7 +52,7 @@ func CopyFileOld(srcPath string, dstPath string) (count int64, err error) {
 	return
 }
 
-func CopyFile(srcPath string, dstPath string) (count int64, err error) {
+func CopyFileWithDefer(srcPath string, dstPath string) (count int64, err error) {
 	src, err := os.Open(srcPath)
 	if err != nil {
 		return 0, err
@@ -71,4 +66,12 @@ func CopyFile(srcPath string, dstPath string) (count int64, err error) {
 	defer dst.Close()
 
 	return io.Copy(src, dst)
+}
+
+func heading(val string) {
+	output := fmt.Sprintf("***** %s *****", val)
+	line := strings.Repeat("-", len(output))
+
+	fmt.Println(line)
+	fmt.Println(output)
 }

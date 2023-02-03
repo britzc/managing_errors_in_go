@@ -7,9 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
-func queryValsHandler(w http.ResponseWriter, r *http.Request) {
+func QueryValsHandler(w http.ResponseWriter, r *http.Request) {
 	vals := r.URL.Query()
 
 	items := vals["name"]
@@ -26,7 +27,7 @@ type Person struct {
 	Age  int    `json:"age"`
 }
 
-func jsonHandler(w http.ResponseWriter, r *http.Request) {
+func BodyJSONHandler(w http.ResponseWriter, r *http.Request) {
 	var p Person
 
 	err := json.NewDecoder(r.Body).Decode(&p)
@@ -38,13 +39,13 @@ func jsonHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Person: %+v", p)
 }
 
-func errorHandler1(w http.ResponseWriter, r *http.Request) {
+func HTTPErrorWithHeader(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Name not provided")
 
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func errorHandlerr2(w http.ResponseWriter, r *http.Request) {
+func HTTPErrorWithoutHeader(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Name not provided", http.StatusBadRequest)
 }
 
@@ -73,7 +74,7 @@ func errFunc() error {
 	return fmt.Errorf("api error: %w", dbErr)
 }
 
-func main1() {
+func ErrorWrap() {
 	err := errFunc()
 	fmt.Println(err)
 
@@ -81,16 +82,7 @@ func main1() {
 	fmt.Println(uwErr)
 }
 
-func main2() {
-	http.HandleFunc("/", errorHandler1)
-
-	err := http.ListenAndServe(":8090", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func main() {
+func HTTPRequestError() {
 	resp, err := http.Get("http://localhost:9999")
 	if err != nil {
 		log.Fatal(err)
@@ -102,4 +94,20 @@ func main() {
 	}
 
 	log.Printf(string(body))
+}
+
+func main() {
+	heading("Error Wrap Output")
+	ErrorWrap()
+
+	heading("HTTP Request Output")
+	HTTPRequestError()
+}
+
+func heading(val string) {
+	output := fmt.Sprintf("***** %s *****", val)
+	line := strings.Repeat("-", len(output))
+
+	fmt.Println(line)
+	fmt.Println(output)
 }
